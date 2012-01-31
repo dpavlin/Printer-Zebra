@@ -3,13 +3,15 @@ use warnings;
 use strict;
 use autodie;
 
-my $file = shift @ARGV || die "usage: $0 dump.zpl";
+# convert Zebra label printer ZPL to pbm image
+
+my $file = shift @ARGV || die "usage: $0 dump.zpl > dump.pbm";
 
 open(my $in, '<', $file);
 
 while(<$in>) {
 	chomp;
-	if ( /~DG(\w):(.+)/ ) {
+	if ( /~DG(\w+:)?(.+)/ ) {
 		my ( $name, $t,$w ) = split(/,/,$2,4);
 
 		warn "# $_ => [$name] t=$t w=$w\n";
