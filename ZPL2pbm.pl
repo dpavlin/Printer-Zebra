@@ -2,19 +2,22 @@
 use warnings;
 use strict;
 use autodie;
+use Data::Dump qw(dump);
 
 # convert Zebra label printer ZPL to pbm image
 
 my $file = shift @ARGV || die "usage: $0 dump.zpl > dump.pbm";
 
 open(my $in, '<', $file);
+my $line = <$in>;
 
-while(<$in>) {
-	chomp;
-	if ( /~DG(\w+:)?(.+)/ ) {
+while( $line ) {
+	$line =~ s/[\r\n]+$//;
+	warn "# line ",dump($line);
+	if ( $line =~ s/~DG(\w+:)?(.+)// ) {
 		my ( $name, $t,$w ) = split(/,/,$2,4);
 
-		warn "# $_ => [$name] t=$t w=$w\n";
+		warn "# ~DG$1 => [$name] t=$t w=$w\n";
 
 		my $data;
 		read $in, $data, $t;
@@ -49,12 +52,12 @@ while(<$in>) {
 				}
 			} else {
 				warn "ABORT: offset $p data [$c]";
+				$line = $c . substr($data,$p);
 				last;
 			}
 
-			warn "## $repeat [$c] out = ",length($out);
+			warn "## $repeat [$c] out = ",length($out),$/;
 		}
-
 
 		my $bitmap = pack('H*', $out);
 		warn "# graphics of ",length($data)," bytes ZPL decompressed to ",length($out)," hex and ", length($bitmap), " bytes bitmap\n";
@@ -62,7 +65,9 @@ while(<$in>) {
 		my $ph = int(length($bitmap) / $w);
 		print "P4\n$pw $ph\n", substr($bitmap,0,$ph*$w);
 
-	} else {
-		warn "IGNORED: $_\n";
+	} elsif ( $line =~ s/^([~\^][^~\^]*)// ) {
+		warn "ZPL: $1\n";
 	}
+
+	$line = <$in> unless length $line > 0;
 }
