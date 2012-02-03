@@ -25,7 +25,7 @@ slurp_line;
 
 while( $line ) {
 	$line =~ s/[\r\n]+$// && warn "## removed CR/LF\n";
-	warn "# line ",dump($line),$/;
+	warn "# line ",dump($line),$/ if length($line) < 80 or $ENV{DEBUG};
 	if ( $line =~ s/~DG(\w+:)?(.+)// ) {
 		my ( $name, $t,$w ) = split(/,/,$2,4);
 
@@ -37,7 +37,7 @@ while( $line ) {
 		my $out;
 		# ZPL decompress
 		my $repeat = 1;
-		foreach my $p ( 0 .. length($data) ) {
+		foreach my $p ( 0 .. length($data) - 1 ) {
 			my $c = substr($data,$p,1);
 			if ( $c eq ',' ) {
 				my $l = ( $w * 2 ) - length($out) % ( $w * 2 );
@@ -53,7 +53,7 @@ while( $line ) {
 				$repeat += 20 * ( ord($c) - ord('f') );
 			} elsif ( $c ge 'G' && $c le 'Y' ) {
 				$repeat += ord($c) - ord('F');
-			} elsif ( $c =~ m/[0-9A-F]/ ) {
+			} elsif ( $c =~ m/[0-9A-F]/i ) {
 				if ( $repeat ) {
 					warn "# $p $repeat $c\n";
 					$out .= $c x $repeat;
@@ -86,6 +86,9 @@ while( $line ) {
 			warn "UNKNOWN: ",dump($1),$/;
 		}
 		$line =~ s/^[\r\n]+// && warn "## removed CR/LF\n";
+	} else {
+		my $unknown = $1 if $line =~ s/^(.)//; # printer seems to ignore invalid chars
+		warn "IGNORE: ",dump($unknown);
 	}
 
 	slurp_line;
