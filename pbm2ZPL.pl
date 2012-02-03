@@ -25,4 +25,4 @@ foreach my $y ( 0 .. $h - 1 ) {
 	print unpack('H*', $line);
 }
 
-print "^^XA\r\n^MMT\r\n^LL0328\r\n^PW831\r\n^LS0\r\n^FT0,352^XG000.GRF,1,1^FS\r\n^PQ1,0,1,Y^XZ\r\n^XA^ID000.GRF^FS^XZ";
+print "^XA\r\n^MMT\r\n^LL0328\r\n^PW831\r\n^LS0\r\n^FT0,352^XG000.GRF,1,1^FS\r\n^PQ1,0,1,Y^XZ\r\n^XA^ID000.GRF^FS^XZ";
