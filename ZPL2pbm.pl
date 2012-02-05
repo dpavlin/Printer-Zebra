@@ -31,8 +31,7 @@ while( $line ) {
 
 		warn "# ~DG$1 => [$name] t=$t w=$w\n";
 
-		my $data;
-		read $in, $data, $t;
+		my $data = <$in>;
 
 		my $out;
 		# ZPL decompress
