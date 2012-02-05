@@ -6,7 +6,7 @@ use Data::Dump qw(dump);
 
 # DG compression is documented in ZPL II Programming Guide Volume Two, page 71-72
 
-my $compress = $ENV{COMPRESS} || 0;
+my $compress = $ENV{COMPRESS} || 1;
 
 my $pnm_file = shift @ARGV || die "usage: $0 print.pnm";
 
@@ -26,6 +26,26 @@ printf "~DG000.GRF,%d,%d,\r\n", $w / 8 * $h, $w / 8;
 
 my $last_line = '';
 
+sub zpl_compress {
+	my $compress = shift;
+	my $repeat = length($compress);
+	my $out;
+	while ( $repeat >= 400 ) {
+		$out .= 'z';
+		$repeat -= 400;
+	}
+	if ( $repeat >= 20 ) {
+		$out .= chr( ord('f') + ( $repeat / 20 ) );
+		$repeat %= 20;
+	}
+	if ( $repeat > 0 ) {
+		$out .= chr( ord('F') + $repeat );
+	}
+	$out .= substr($compress,0,1); # char
+	warn "## zpl_compress $repeat = $compress -> $out\n";
+	return $out;
+}
+
 foreach my $y ( 0 .. $h - 1 ) {
 	my $line = substr( $bitmap, $y * ( $w / 8 ), $w / 8 );
 	if ( $line eq $last_line ) {
@@ -36,6 +56,7 @@ foreach my $y ( 0 .. $h - 1 ) {
 #			$last_line = $line;
 			$hex =~ s/0+$/,/  && warn "# $y fill 0 to right\n";
 			$hex =~ s/F+$/!/i && warn "# $y fill 1 to right\n";
+			$hex =~ s/((.)\2+)/zpl_compress($1)/egs;
 		}
 		print $hex;
 	}
