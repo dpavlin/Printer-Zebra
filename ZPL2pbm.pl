@@ -35,7 +35,7 @@ while( $line ) {
 
 		my $out;
 		# ZPL decompress
-		my $repeat = 1;
+		my $repeat = 0;
 		foreach my $p ( 0 .. length($data) - 1 ) {
 			my $c = substr($data,$p,1);
 			if ( $c eq ',' ) {
@@ -50,7 +50,7 @@ while( $line ) {
 				$out .= "1" x $l;
 			} elsif ( $c eq ':' ) {
 				$out .= length($out) > $w ? substr($out,-$w*2) : "00" x $w;
-				warn "# $p :\n";
+				warn "# $p repeat last line\n";
 			} elsif ( $c eq 'z' ) {
 				$repeat += 400;
 			} elsif ( $c ge 'g' && $c le 'y' ) {
