@@ -23,7 +23,7 @@ my $call4 = join(' ', @ARGV);
 my $pbm = "/tmp/$barcode.pbm";
 
 open(my $from, '<',  "templates/$size.svg");
-open(my $to,   '|-', "convert -density $density - $pbm");
+open(my $to,   '|-', "convert -units PixelsPerInch -density $density - $pbm");
 while(<$from>) {
 	s/1301272944/$barcode/gs && warn "# barcode $barcode\n";
 	s/##call1##/$call1/gs    && warn "# 1: $call1\n";
