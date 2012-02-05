@@ -44,6 +44,11 @@ while( $line ) {
 				$l = $w * 2 if $l == 0;
 				warn "# $p ZERO-to-EOL $c [$l]\n";
 				$out .= "0" x $l;
+			} elsif ( $c eq '!' ) {
+				my $l = ( $w * 2 ) - length($out) % ( $w * 2 );
+				$l = $w * 2 if $l == 0;
+				warn "# $p ONE-to-EOL $c [$l]\n";
+				$out .= "1" x $l;
 			} elsif ( $c eq ':' ) {
 				$out .= length($out) > $w ? substr($out,-$w*2) : "00" x $w;
 				warn "# $p :\n";
