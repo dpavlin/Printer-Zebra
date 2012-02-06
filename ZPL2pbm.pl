@@ -35,11 +35,20 @@ while( $line ) {
 
 		my $w = $row_bytes * 2; # hex digits
 
-		my $out;
+		my $out = '';
 		# ZPL decompress
 		my $repeat = 0;
 		foreach my $p ( 0 .. length($data) - 1 ) {
+
+			if ( length($out) == $total_bytes * 2 ) {
+				warn "END of bitmap\n";
+				$line = substr($data,$p);
+				slurp_line;
+				last;
+			};
+
 			my $c = substr($data,$p,1);
+
 			if ( $c eq ',' ) {
 				my $l = $w - ( length($out) % $w );
 				$l = $w if $l == 0;
@@ -70,10 +79,7 @@ while( $line ) {
 					$out .= $c;
 				}
 			} else {
-				warn "ABORT: offset $p data [$c]";
-				$line = $c . substr($data,$p);
-				slurp_line;
-				last;
+				die "ABORT: offset $p data [$c]";
 			}
 
 			warn "## $repeat [$c] out = ",length($out),$/;
