@@ -27,11 +27,13 @@ while( $line ) {
 	$line =~ s/[\r\n]+$// && warn "## removed CR/LF\n";
 	warn "# line ",dump($line),$/ if length($line) < 80 or $ENV{DEBUG};
 	if ( $line =~ s/~DG(\w+:)?(.+)// ) {
-		my ( $name, $t,$w ) = split(/,/,$2,4);
+		my ( $name, $total_bytes, $row_bytes ) = split(/,/,$2,4);
 
-		warn "# ~DG$1 => [$name] t=$t w=$w\n";
+		warn "# ~DG$1 => [$name] $total_bytes bytes $row_bytes in row\n";
 
 		my $data = <$in>;
+
+		my $w = $row_bytes * 2; # hex digits
 
 		my $out;
 		# ZPL decompress
@@ -39,17 +41,18 @@ while( $line ) {
 		foreach my $p ( 0 .. length($data) - 1 ) {
 			my $c = substr($data,$p,1);
 			if ( $c eq ',' ) {
-				my $l = ( $w * 2 ) - length($out) % ( $w * 2 );
-				$l = $w * 2 if $l == 0;
+				my $l = $w - ( length($out) % $w );
+				$l = $w if $l == 0;
 				warn "# $p ZERO-to-EOL $c [$l]\n";
 				$out .= "0" x $l;
 			} elsif ( $c eq '!' ) {
-				my $l = ( $w * 2 ) - length($out) % ( $w * 2 );
-				$l = $w * 2 if $l == 0;
+				my $l = $w - ( length($out) % $w );
+				$l = $w if $l == 0;
 				warn "# $p ONE-to-EOL $c [$l]\n";
 				$out .= "F" x $l;
 			} elsif ( $c eq ':' ) {
-				$out .= length($out) > $w ? substr($out,-$w*2) : "00" x $w;
+#				$out .= length($out) > $w ? substr($out,-$w) : "0" x $w;
+				$out .= substr($out,-$w);
 				warn "# $p repeat last line\n";
 			} elsif ( $c eq 'z' ) {
 				$repeat += 400;
@@ -78,9 +81,9 @@ while( $line ) {
 
 		my $bitmap = pack('H*', $out);
 		warn "# graphics of ",length($data)," bytes ZPL decompressed to ",length($out)," hex and ", length($bitmap), " bytes bitmap\n";
-		my $pw = $w * 8;
-		my $ph = int(length($bitmap) / $w);
-		print "P4\n$pw $ph\n", substr($bitmap,0,$ph*$w);
+		my $pw = $row_bytes * 8;
+		my $ph = int(length($bitmap) / $row_bytes);
+		print "P4\n$pw $ph\n", substr($bitmap,0,$ph*$row_bytes);
 
 	} elsif ( $line =~ s/^([~\^][^~\^\r\n]*)// ) {
 		my $cmd = substr($1,0,3);
