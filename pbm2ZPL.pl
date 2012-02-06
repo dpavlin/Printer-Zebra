@@ -13,8 +13,9 @@ my $pnm_file = shift @ARGV || die "usage: $0 print.pnm";
 open(my $fh, '<', $pnm_file);
 my $p4 = <$fh>; chomp $p4;
 die "no P4 header in [$p4] from $pnm_file" unless $p4 eq 'P4';
-my $size = <$fh>; chomp $size;
-my $size = <$fh>; chomp $size if $size =~ m/^#/;
+my $size = <$fh>;
+while ( $size =~ m/^#/ ) { $size = <$fh> }; # skip comments
+chomp $size;
 my ( $w, $h ) = split(/ /,$size,$2);
 warn "WARNING: width of $pnm_file not 832 but $w !\n" if $w != 832;
 local $/ = undef;
