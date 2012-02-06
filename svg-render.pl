@@ -12,13 +12,10 @@ my $w = 832;
 my $density = $w / 5166 * 1000;
 warn "# density = $density\n";
 
+my $args = join(' ', @ARGV);
+die "usage: $0 1301272944 callnumber\n" unless $args;
 
-my $barcode = shift @ARGV || die "usage: $0 1301272944 callnumber\n";
-
-my $call1 = shift @ARGV;
-my $call2 = shift @ARGV;
-my $call3 = shift @ARGV;
-my $call4 = join(' ', @ARGV);
+my ( $barcode, $call1, $call2, $call3, $call4 ) = split(/\s+/, $args, 5);
 
 my $pbm = "/tmp/$barcode.pbm";
 
