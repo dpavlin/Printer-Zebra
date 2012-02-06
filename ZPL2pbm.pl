@@ -47,7 +47,7 @@ while( $line ) {
 				my $l = ( $w * 2 ) - length($out) % ( $w * 2 );
 				$l = $w * 2 if $l == 0;
 				warn "# $p ONE-to-EOL $c [$l]\n";
-				$out .= "1" x $l;
+				$out .= "F" x $l;
 			} elsif ( $c eq ':' ) {
 				$out .= length($out) > $w ? substr($out,-$w*2) : "00" x $w;
 				warn "# $p repeat last line\n";
