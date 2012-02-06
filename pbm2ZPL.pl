@@ -37,7 +37,7 @@ print '^MD13'; # media darkness -30 .. 30 / XiIIIPlus 0..30/0.1 increments
 print '^JUS'; # configuration update F = factory default R = recall S = save
 print '^LRN'; # label reverse Y/N
 print '^CI0'; # change international font 0..255
-print '^XZ'; 
+print "^XZ\r\n";
 
 printf "~DG000.GRF,%d,%d,\r\n", $w / 8 * $h, $w / 8;
 
@@ -87,9 +87,9 @@ print '^LS0'; # label shift -9999..9999
 printf '^FT%d,%d', 0, $h; # field typeset x,y graphic origin is bottom-left
 print '^XG000.GRF,1,1^FS'; # recall grapmic source/name,magnification_x,magnification_y
 print '^PQ1,0,1,Y'; # print quantity total,pause/cut,replicates,no_pause
-print '^XZ';
+print "^XZ\r\n";
 
 print '^XA';
 print '^ID000.GRF^FS'; # object delete
-print '^XZ';
+print "^XZ\r\n";
 
