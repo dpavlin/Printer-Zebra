@@ -66,11 +66,12 @@ sub zpl_compress {
 foreach my $y ( 0 .. $h - 1 ) {
 	my $line = substr( $bitmap, $y * ( $w / 8 ), $w / 8 );
 	if ( $line eq $last_line ) {
-		print ":" && warn "# $y repeat previous line\n";
+		print ':';
+		warn "# $y repeat previous line\n";
 	} else {
 		my $hex = unpack('H*', $line);
 		if ( $compress ) {
-#			$last_line = $line;
+			$last_line = $line;
 			$hex =~ s/0+$/,/  && warn "# $y fill 0 to right\n";
 			$hex =~ s/F+$/!/i && warn "# $y fill 1 to right\n";
 			$hex =~ s/((.)\2+)/zpl_compress($1)/egs;
