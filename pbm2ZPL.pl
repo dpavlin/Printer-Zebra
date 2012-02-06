@@ -14,13 +14,29 @@ open(my $fh, '<', $pnm_file);
 my $p4 = <$fh>; chomp $p4;
 die "no P4 header in [$p4] from $pnm_file" unless $p4 eq 'P4';
 my $size = <$fh>; chomp $size;
+my $size = <$fh>; chomp $size if $size =~ m/^#/;
 my ( $w, $h ) = split(/ /,$size,$2);
 warn "WARNING: width of $pnm_file not 832 but $w !\n" if $w != 832;
 local $/ = undef;
 my $bitmap = <$fh>;
 
 
-print "^XA~TA000~JSN^LT18^MNW^MTD^PON^PMN^LH0,0^JMA^PR4,4^MD13^JUS^LRN^CI0^XZ";
+print '^XA';
+printf '~TA%03d', 0; # tear-off
+print '~JSN'; # sensor detect N = normal, 90%
+print '^LT18'; # label top -120 .. 120
+print '^MNW'; # media tracking N = continuous Y/W = web sensing M = mark sensing
+print '^MTD'; # media type T = termal D = direct (ribbon!)
+print '^PON'; # print orientation N = normal I = invert
+print '^PMN'; # print mirror Y/N
+print '^LH0,0'; # label home x,y
+print '^JMA'; # dots/mm A = 24/12/8/6 B = 12/6/4/3
+print '^PR4,4'; # print,slew,backfeed speed in inch/s 2 .. 12 [default: 2,6,2]
+print '^MD13'; # media darkness -30 .. 30 / XiIIIPlus 0..30/0.1 increments
+print '^JUS'; # configuration update F = factory default R = recall S = save
+print '^LRN'; # label reverse Y/N
+print '^CI0'; # change international font 0..255
+print '^XZ'; 
 
 printf "~DG000.GRF,%d,%d,\r\n", $w / 8 * $h, $w / 8;
 
@@ -62,4 +78,17 @@ foreach my $y ( 0 .. $h - 1 ) {
 	}
 }
 
-print "^XA\r\n^MMT\r\n^LL0328\r\n^PW831\r\n^LS0\r\n^FT0,352^XG000.GRF,1,1^FS\r\n^PQ1,0,1,Y^XZ\r\n^XA^ID000.GRF^FS^XZ";
+print '^XA';
+print '^MMT'; # print mode,prepeel T=tear-off P=peel-off R=rewind A=applicator C=cutter, Y/N
+printf '^LL%d', $h; # label length FIXME ignore empty bottom
+printf '^PW%d', $w; # print width
+print '^LS0'; # label shift -9999..9999
+printf '^FT%d,%d', 0, $h; # field typeset x,y graphic origin is bottom-left
+print '^XG000.GRF,1,1^FS'; # recall grapmic source/name,magnification_x,magnification_y
+print '^PQ1,0,1,Y'; # print quantity total,pause/cut,replicates,no_pause
+print '^XZ';
+
+print '^XA';
+print '^ID000.GRF^FS'; # object delete
+print '^XZ';
+
