@@ -13,7 +13,7 @@ while(<DATA>) {
 	$command->{$cmd} = $desc;
 }
 
-my $file = shift @ARGV || die "usage: $0 dump.zpl > dump.pbm";
+my $file = shift @ARGV || die "usage: $0 dump.zpl > dump.pbm\n";
 
 open(my $in, '<', $file);
 

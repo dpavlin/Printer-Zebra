@@ -8,7 +8,7 @@ use Data::Dump qw(dump);
 
 my $compress = $ENV{COMPRESS} || 1;
 
-my $pnm_file = shift @ARGV || die "usage: $0 print.pnm";
+my $pnm_file = shift @ARGV || die "usage: $0 print.pnm > print.zpl\n";
 
 open(my $fh, '<', $pnm_file);
 my $p4 = <$fh>; chomp $p4;
