@@ -6,6 +6,7 @@ use Data::Dump qw(dump);
 
 # DG compression is documented in ZPL II Programming Guide Volume Two, page 71-72
 
+my $darkness = $ENV{DARKNESS} || 0;
 my $compress = $ENV{COMPRESS} || 1;
 
 my $pnm_file = shift @ARGV || die "usage: $0 print.pnm > print.zpl\n";
@@ -33,7 +34,7 @@ print '^PMN'; # print mirror Y/N
 print '^LH0,0'; # label home x,y
 print '^JMA'; # dots/mm A = 24/12/8/6 B = 12/6/4/3
 print '^PR4,4'; # print,slew,backfeed speed in inch/s 2 .. 12 [default: 2,6,2]
-print '^MD13'; # media darkness -30 .. 30 / XiIIIPlus 0..30/0.1 increments
+printf '^MD%d', $darkness ; # media darkness -30 .. 30 / XiIIIPlus 0..30/0.1 increments
 print '^JUS'; # configuration update F = factory default R = recall S = save
 print '^LRN'; # label reverse Y/N
 print '^CI0'; # change international font 0..255
