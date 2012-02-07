@@ -1,0 +1,25 @@
+Zebra label printer ZPL interpreter and rasterizator
+
+
+Convert pbm image file to ZPL:
+
+	pbm2ZPL.pl print.pnm > print.zpl
+
+Convert ZPL back into pbm image:
+
+	ZPL2pbm.pl dump.zpl > dump.pbm
+
+
+
+This is my attempt to document various quirks using Zebra printers:
+
+
+Windows printer driver doesn't seem to support ZPL when shared over CIFS.
+
+There is option to check pass-through, but then you have to wrap ZPL in
+start/end markers which cups printer driver doesn't do.
+
+Easier solution is to install port as Generic/Text printer under Windows
+and share printer using lpd which is available in Windows XP and newer.
+
+
