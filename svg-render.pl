@@ -3,25 +3,20 @@ use warnings;
 use strict;
 use autodie;
 
-# 5166 px = 1000 dpi
+# sudo apt-get install librsvg2-bin netpbm
 
-my $size = $ENV{SIZE} || '105x40';
-
-my $w = 832;
-
-my $density = $w / 5166 * 1000;
-warn "# density = $density\n";
+my $size  = $ENV{SIZE}  || '105x40';
+my $width = $ENV{WIDTH} || 832;
 
 my $args = join(' ', @ARGV);
-die "usage: $0 1301272944 callnumber\n" unless $args;
+die "usage: $0 1301272944 callnumber > label.pbm\n" unless $args;
 
 my ( $barcode, $call1, $call2, $call3, $call4 ) = split(/\s+/, $args, 5);
 
-my $pbm = "/tmp/$barcode.pbm";
-
 open(my $from, '<',  "templates/$size.svg");
-open(my $to,   '|-', "convert -units PixelsPerInch -density $density - $pbm");
+open(my $to,   '|-', "rsvg-convert --width=$width --format=png --background-color=white | pngtopnm | pnmdepth 2");
 while(<$from>) {
+	no warnings 'uninitialized';
 	s/1301272944/$barcode/gs && warn "# barcode $barcode\n";
 	s/##call1##/$call1/gs    && warn "# 1: $call1\n";
 	s/##call2##/$call2/gs    && warn "# 2: $call2\n";
@@ -32,7 +27,4 @@ while(<$from>) {
 }
 close($from);
 close($to);
-
-warn "$pbm ", -s $pbm, " bytes\n";
-
 
