@@ -12,15 +12,47 @@ my $compress = $ENV{COMPRESS} || 1;
 my $pnm_file = shift @ARGV || die "usage: $0 print.pnm > print.zpl\n";
 
 open(my $fh, '<', $pnm_file);
-my $p4 = <$fh>; chomp $p4;
-die "no P4 header in [$p4] from $pnm_file" unless $p4 eq 'P4';
+my $magic = <$fh>; chomp $magic;
 my $size = <$fh>;
 while ( $size =~ m/^#/ ) { $size = <$fh> }; # skip comments
 chomp $size;
-my ( $w, $h ) = split(/ /,$size,$2);
+my ( $w, $h ) = split(/ /,$size,2);
 warn "WARNING: width of $pnm_file not 832 but $w !\n" if $w != 832;
-local $/ = undef;
-my $bitmap = <$fh>;
+
+my $bitmap;
+
+if ( $magic eq 'P4' ) {
+	local $/ = undef;
+	$bitmap = <$fh>;
+} elsif ( $magic eq 'P6' ) {
+	my $max_color = <$fh>; chomp $max_color;
+
+	my $trashold = $max_color / 2;
+
+	local $/ = undef;
+	my $rgb = <$fh>;
+
+	my $mask = 0x80;
+	my $byte = 0;
+
+	my $o = 0;
+	while ( $o < length($rgb) ) {
+		my $px = ord(substr($rgb,$o,1)); $o += 3;
+		$byte ^= $mask if $px < $trashold;
+		$mask >>= 1;
+		if ( ! $mask ) {
+			$bitmap .= chr($byte);
+			$byte = 0;
+			$mask = 0x80;
+		}
+	}
+
+	warn dump $bitmap;
+
+} else {
+	die "$pnm_file magick $magic not supported\n";
+}
+
 
 
 print '^XA';
