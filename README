@@ -11,7 +11,8 @@ Convert ZPL back into pbm image:
 
 
 
-This is my attempt to document various quirks using Zebra printers:
+This is my attempt to document various quirks using Zebra printers
+attached to Windows machines using USB:
 
 
 Windows printer driver doesn't seem to support ZPL when shared over CIFS.
@@ -22,4 +23,45 @@ start/end markers which cups printer driver doesn't do.
 Easier solution is to install port as Generic/Text printer under Windows
 and share printer using lpd which is available in Windows XP and newer.
 
+Install "zpl" printer with Generic / Text driver on Windows:
+
+	Start > Printers and Faxes
+	Add a printer > Next >
+		Local printer attached to this computer >
+		Use port: USB001 (Virtual printer port for USB) > Next >
+		Generic > Generic / Text Only > Next >
+		Printer name: zpl > default printer ? > No > Next >
+		Do not share this printer > Next >
+		Do you want to print a test page? > No > Next > Finish
+
+Install lpd server on Windows:
+
+	Start > Control Panel
+	Add or Remove programs > Add/Remove Windows Components >
+	Other Network File and Print Services > Details >
+	Print Services for Unix > OK > Next > Finish
+
+	[ Restart Windows to complete install ]
+
+Allow connections from local subnet to port 515:
+
+	Network Connections > Local Area Connection > Properties >
+	Advanced - Windows Firewal > Settings >
+	Exceptions > File and Printer Sharing > Add Port >
+	Name: printer Port Number: 515 > TCP > Change scope >
+	Ny network (subnet) only > OK > OK > OK ...
+
+Enable lpd service:
+
+	Control Panel > Administrative Tools > Services >
+	TCP/IP Print Server > Startup type: Automatic > Apply >
+	Start > OK
+
+Verify that lpd and firewall settings are correct:
+
+	dpavlin@t61p:~$ rlpq -H 10.60.1.30 -P zpl
+	rlpq: warning: cannot bind to privileged port: lpd may reject
+
+		Windows XP LPD Server
+		Printer \\10.60.1.30\zpl
 
