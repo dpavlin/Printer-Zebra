@@ -1,0 +1,16 @@
+# test with:
+# wget --header='Host: printer-zebra.vbz.ffzg.hr' -O print.png 'http://10.60.0.10/print.cgi?print=1234' && qiv print.png
+# wget --header='Host: printer-zebra.vbz.ffzg.hr' -O - 'http://10.60.0.10/status.cgi'
+
+<VirtualHost *:80>
+	ServerName printer-zebra.vbz.ffzg.hr
+
+	# print.cgi will create this directory with correct permissions
+	DocumentRoot /tmp/zebra
+
+	ScriptAlias /print.cgi /srv/Printer-Zebra/print.cgi
+	ScriptAlias /status.cgi /srv/Printer-Zebra/status.cgi
+
+	ErrorLog /var/log/koha/printer-zebra.error.log
+
+</VirtualHost>
