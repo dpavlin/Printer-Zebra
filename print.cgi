@@ -38,6 +38,11 @@ close($to);
 
 system "./pbm2ZPL.pl $tmp/$barcode.pnm | rlpr --printhost=$ip --printer=zpl --windows --verbose";
 
+unlink "$tmp/$barcode.pnm";
+
+my $status = `rlpq --printhost=$ip --printer=zpl 2>&1 | tee $tmp/$ip.status`;
+die "$status\n" if $status =~ m/error/;
+
 if ( my $return = $q->param('return') ) {
 	print $q->redirect( $q->param('return') . '&station=' . $ip );
 } else {
