@@ -58,7 +58,7 @@ if ( $magic eq 'P4' ) {
 print '^XA';
 printf '~TA%03d', 0; # tear-off
 print '~JSN'; # sensor detect N = normal, 90%
-print '^LT18'; # label top -120 .. 120
+#print '^LT18'; # label top -120 .. 120
 print '^MNW'; # media tracking N = continuous Y/W = web sensing M = mark sensing
 print '^MTD'; # media type T = termal D = direct (ribbon!)
 print '^PON'; # print orientation N = normal I = invert
