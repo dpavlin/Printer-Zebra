@@ -11,6 +11,7 @@
 	ScriptAlias /print.cgi /srv/Printer-Zebra/print.cgi
 	ScriptAlias /status.cgi /srv/Printer-Zebra/status.cgi
 
+	CustomLog /var/log/koha/printer-zebra.access.log combined
 	ErrorLog /var/log/koha/printer-zebra.error.log
 
 </VirtualHost>
